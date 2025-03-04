@@ -6,17 +6,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math/big"
 	"net/http"
 	"time"
 )
 
 type TokenData struct {
-	Balance         *big.Int `json:"balance"`
-	ContractAddress string   `json:"contract_address"`
-	Decimals        int      `json:"decimals"`
-	Name            string   `json:"name"`
-	Symbol          string   `json:"symbol"`
+	Balance         string `json:"balance"`
+	ContractAddress string `json:"contract_address"`
+	Decimals        int    `json:"decimals"`
+	Name            string `json:"name"`
+	Symbol          string `json:"symbol"`
 }
 
 type ApiResponse struct {

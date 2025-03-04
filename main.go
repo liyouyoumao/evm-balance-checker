@@ -37,7 +37,7 @@ func main() {
 		Token: token,
 	}
 
-	input, err := bcabi.Pack("balances", user, []balancechecker.BalanceCheckerUserToken{userToken})
+	input, err := bcabi.Pack("balances", []balancechecker.BalanceCheckerUserToken{userToken})
 	if err != nil {
 		log.Fatal(err)
 	}
