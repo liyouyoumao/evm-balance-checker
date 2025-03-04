@@ -17,7 +17,7 @@ import (
 const (
 	rpcURL = "https://data-seed-prebsc-1-s1.bnbchain.org:8545" // BSC测试网
 	// 请替换为您自己的私钥（不要在生产环境中硬编码私钥）
-	privateKey = "PRIVATE-KEY"
+	privateKey = ""
 )
 
 func main() {

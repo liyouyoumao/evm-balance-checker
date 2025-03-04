@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -29,7 +29,7 @@ type ApiResponse struct {
 const (
 	apiKey    = "2thYXJz54CmPOXvJu7M8m9oDQbt"
 	baseURL   = "https://api.chainbase.online/v1/account/tokens"
-	rateLimit = time.Second
+	rateLimit = time.Second / 2
 	chanId    = 97
 	limit     = 100
 )
@@ -63,7 +63,7 @@ func fetchTokenBalances(chainID int, address string, limit int) ([]TokenData, er
 		}
 		defer resp.Body.Close()
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
 		}
@@ -74,6 +74,10 @@ func fetchTokenBalances(chainID int, address string, limit int) ([]TokenData, er
 		}
 
 		if apiResponse.Code != 0 {
+			if apiResponse.Code == 429 {
+				time.Sleep(100 * time.Millisecond)
+				continue
+			}
 			return nil, fmt.Errorf("API error: %s", apiResponse.Message)
 		}
 
