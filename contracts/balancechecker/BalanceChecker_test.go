@@ -3,11 +3,10 @@ package balancechecker_test
 import (
 	"bytes"
 	"context"
+	"evm-balance-checker/contracts/balancechecker"
 	"log"
 	"log/slog"
 	"testing"
-
-	balancechecker "evm-balance-checker/contracts"
 
 	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -15,8 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-const rpcURL = "https://data-seed-prebsc-1-s1.bnbchain.org:8545"
-const contractAddress = "0x88d5AC5C25C8fB4bC560af5DA99be24CAEcd99e7"
+const rpcURL = "https://bsc-dataseed.bnbchain.org"
+const contractAddress = "0x58D3b153E328fa3b93fdD122A942d8Ba50bAFA1D"
 
 func TestBalances(t *testing.T) {
 	// 连接到以太坊客户端

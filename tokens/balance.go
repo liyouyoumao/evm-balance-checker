@@ -1,4 +1,4 @@
-package main
+package tokens
 
 import (
 	"context"
@@ -34,11 +34,11 @@ const (
 	limit     = 100
 )
 
-func GetTokensBalance(ctx context.Context, address string) ([]TokenData, error) {
-	return fetchTokenBalances(chanId, address, limit)
+func GetAccountAllTokensBalances(ctx context.Context, address string) ([]TokenData, error) {
+	return fetchTokenBalances(ctx, chanId, address, limit)
 }
 
-func fetchTokenBalances(chainID int, address string, limit int) ([]TokenData, error) {
+func fetchTokenBalances(ctx context.Context, chainID int, address string, limit int) ([]TokenData, error) {
 	if limit > 100 {
 		return nil, fmt.Errorf("limit must be <= 100")
 	}
@@ -47,65 +47,51 @@ func fetchTokenBalances(chainID int, address string, limit int) ([]TokenData, er
 	throttle := time.Tick(rateLimit)
 
 	for {
-		<-throttle
-		url := fmt.Sprintf("%s?chain_id=%d&address=%s&limit=%d&page=%d", baseURL, chainID, address, limit, page)
-		req, err := http.NewRequest("GET", url, nil)
-		if err != nil {
-			return nil, err
-		}
-		req.Header.Set("x-api-key", apiKey)
-		req.Header.Set("accept", "application/json")
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		var apiResponse ApiResponse
-		if err := json.Unmarshal(body, &apiResponse); err != nil {
-			return nil, err
-		}
-
-		if apiResponse.Code != 0 {
-			if apiResponse.Code == 429 {
-				time.Sleep(100 * time.Millisecond)
-				continue
+		select {
+		case <-ctx.Done():
+			return allTokens, nil
+		case <-throttle:
+			<-throttle
+			url := fmt.Sprintf("%s?chain_id=%d&address=%s&limit=%d&page=%d", baseURL, chainID, address, limit, page)
+			req, err := http.NewRequest("GET", url, nil)
+			if err != nil {
+				return nil, err
 			}
-			return nil, fmt.Errorf("API error: %s", apiResponse.Message)
+			req.Header.Set("x-api-key", apiKey)
+			req.Header.Set("accept", "application/json")
+
+			client := &http.Client{}
+			resp, err := client.Do(req)
+			if err != nil {
+				return nil, err
+			}
+			defer resp.Body.Close()
+
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+
+			var apiResponse ApiResponse
+			if err := json.Unmarshal(body, &apiResponse); err != nil {
+				return nil, err
+			}
+
+			if apiResponse.Code != 0 {
+				if apiResponse.Code == 429 {
+					time.Sleep(100 * time.Millisecond)
+					continue
+				}
+				return nil, fmt.Errorf("API error: %s", apiResponse.Message)
+			}
+
+			allTokens = append(allTokens, apiResponse.Data...)
+
+			if apiResponse.NextPage == 0 {
+				return allTokens, nil
+			}
+			log.Printf("page: %d success\n", page)
+			page = apiResponse.NextPage
 		}
-
-		allTokens = append(allTokens, apiResponse.Data...)
-
-		if apiResponse.NextPage == 0 {
-			break
-		}
-		log.Printf("page: %d success\n", page)
-		page = apiResponse.NextPage
-	}
-
-	return allTokens, nil
-}
-
-func main() {
-	chainID := 56
-	address := "0x4a6140ad47681021e653b29697a8604ea0259c65"
-	limit := 100
-
-	tokens, err := fetchTokenBalances(chainID, address, limit)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-
-	fmt.Println("Total tokens found:", len(tokens))
-	for _, token := range tokens {
-		fmt.Printf("Token: %s (%s) - Balance: %s, Decimals: %d\n", token.Name, token.Symbol, token.Balance, token.Decimals)
 	}
 }
