@@ -5,6 +5,7 @@ import (
 	"context"
 	balancechecker "evm-balance-checker/contracts"
 	"log"
+	"log/slog"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -13,7 +14,7 @@ import (
 )
 
 const rpcURL = "https://data-seed-prebsc-1-s1.bnbchain.org:8545"
-const contractAddress = "0x98b18FCe8B7A7c5f398CD3a2D5D6352eff14BC24"
+const contractAddress = "0x58d3b153e328fa3b93fdd122a942d8ba50bafa1d"
 
 func main() {
 	// 连接到以太坊客户端
@@ -65,4 +66,5 @@ func main() {
 		log.Fatal(err)
 	}
 
+	slog.Info("output", "TokenBalance", out0)
 }
