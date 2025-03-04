@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"context"
 	balancechecker "evm-balance-checker/contracts"
-	"fmt"
+	"log"
+
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"log"
 )
 
 const rpcURL = "https://data-seed-prebsc-1-s1.bnbchain.org:8545"
@@ -32,7 +32,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	input, err := bcabi.Pack("balances", user, []common.Address{token})
+	userToken := balancechecker.BalanceCheckerUserToken{
+		User:  user,
+		Token: token,
+	}
+
+	input, err := bcabi.Pack("balances", user, []balancechecker.BalanceCheckerUserToken{userToken})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,13 +59,10 @@ func main() {
 		panic("call failed output is empty")
 	}
 
-	var out0 []balancechecker.BalanceCheckerTokenBalanceInfo
+	var out0 []balancechecker.BalanceCheckerTokenBalance
 	err = bcabi.UnpackIntoInterface(&out0, "balances", output)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, info := range out0 {
-		fmt.Printf("contract: %s, Balance: %s, Decimals: %d\n", info.Token, info.Balance.String(), info.Decimals)
-	}
 }

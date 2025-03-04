@@ -1,20 +1,22 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/big"
 	"net/http"
 	"time"
 )
 
 type TokenData struct {
-	Balance         string `json:"balance"`
-	ContractAddress string `json:"contract_address"`
-	Decimals        int    `json:"decimals"`
-	Name            string `json:"name"`
-	Symbol          string `json:"symbol"`
+	Balance         *big.Int `json:"balance"`
+	ContractAddress string   `json:"contract_address"`
+	Decimals        int      `json:"decimals"`
+	Name            string   `json:"name"`
+	Symbol          string   `json:"symbol"`
 }
 
 type ApiResponse struct {
@@ -29,7 +31,13 @@ const (
 	apiKey    = "2thYXJz54CmPOXvJu7M8m9oDQbt"
 	baseURL   = "https://api.chainbase.online/v1/account/tokens"
 	rateLimit = time.Second
+	chanId    = 97
+	limit     = 100
 )
+
+func GetTokensBalance(ctx context.Context, address string) ([]TokenData, error) {
+	return fetchTokenBalances(chanId, address, limit)
+}
 
 func fetchTokenBalances(chainID int, address string, limit int) ([]TokenData, error) {
 	if limit > 100 {
