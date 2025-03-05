@@ -6,6 +6,7 @@ import (
 	"errors"
 	"evm-balance-checker/bigint"
 	"evm-balance-checker/contracts/metadatafetcher"
+	"fmt"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -24,6 +25,7 @@ type Metadata struct {
 
 const rpcURL = "https://bsc-testnet-dataseed.bnbchain.org"
 const contractAddress = "0xb2C827D9d20dc523199F6C658029D7Ac2D56491F"
+const iconBaseURL = "https://dd.dexscreener.com/ds-data/tokens/bsc/%s.png"
 
 func GetTokenMetadata(ctx context.Context, address string) (*Metadata, error) {
 	// 连接到以太坊客户端
@@ -75,6 +77,6 @@ func GetTokenMetadata(ctx context.Context, address string) (*Metadata, error) {
 		Precision:   result.Decimals,
 		TotalSupply: decimal.NewFromFloat(bigint.FromBig(result.TotalSupply).Readable(result.Decimals)).String(),
 		Contract:    address,
-		Icon:        "",
+		Icon:        fmt.Sprintf(iconBaseURL, address),
 	}, nil
 }

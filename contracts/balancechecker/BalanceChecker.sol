@@ -20,7 +20,7 @@ contract BalanceChecker {
     UserToken userToken;
     uint256 balance;
     uint8 decimals;
-    bool invalid;
+    bool valid;
   }
 
   /* Fallback function, don't accept any ETH */
@@ -53,7 +53,7 @@ contract BalanceChecker {
     for (uint256 j = 0; j < userTokens.length;j++) {
       if (userTokens[j].token != address(0)) {
         (uint256 balance, uint8 decimals,bool isErc20) = tokenBalance(userTokens[j].user, userTokens[j].token);
-        tokenBalances[j] = TokenBalance(userTokens[j], balance, decimals,!isErc20);
+        tokenBalances[j] = TokenBalance(userTokens[j], balance, decimals,isErc20);
       } else {
         tokenBalances[j] = TokenBalance(userTokens[j], userTokens[j].user.balance, 18,true);
       }

@@ -10,9 +10,9 @@ contracts/output:
 # 编译 Solidity 合约并生成 Go 绑定
 build-contract: contracts/balancechecker/output
 	# 编译 Solidity 合约生成 ABI 和二进制文件
-	solc --abi --bin contracts/BalanceChecker.sol --overwrite -o contracts/output
+	solc --abi --bin contracts/balancechecker/BalanceChecker.sol --overwrite -o contracts/balancechecker/output
 	# 使用 abigen 生成 Go 绑定代码
-	abigen --bin=contracts/output/BalanceChecker.bin --abi=contracts/output/BalanceChecker.abi --pkg=contracts --out=contracts/balancechecker.go
+	abigen --bin=contracts/balancechecker/output/BalanceChecker.bin --abi=contracts/balancechecker/output/BalanceChecker.abi --pkg=balancechecker --out=contracts/balancechecker/balancechecker.go
 
 build-contract-erc20metadata: 
 	# 编译 Solidity 合约生成 ABI 和二进制文件

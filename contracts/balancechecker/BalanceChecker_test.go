@@ -14,8 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-const rpcURL = "https://bsc-dataseed.bnbchain.org"
-const contractAddress = "0x58D3b153E328fa3b93fdD122A942d8Ba50bAFA1D"
+const rpcURL = "https://bsc-testnet-dataseed.bnbchain.org"
+const contractAddress = "0x47f7d32c8428E0E66CAEa299f49E3e4597901c92"
 
 func TestBalances(t *testing.T) {
 	// 连接到以太坊客户端
